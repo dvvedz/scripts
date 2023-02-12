@@ -12,20 +12,28 @@ function checktools()
     >&2 echo "[!] Checking Dependencies"
     REGULATOR_PATH="$HOME/Hacking/tools/regulator"
 
-    if ! command -v aneww >/dev/null; then
+    if ! command -v puredns >/dev/null; then
+        >&2 printf "${Red}\t[${Cross}] puredns not found, is it installed and in path?${Rst}\n"
+    else
+        >&2 printf "${Green}\t[${Cm}] puredns\tfound\n"
+    fi
+
+    if ! command -v anew >/dev/null; then
         >&2 printf "${Red}\t[${Cross}] anew not found, is it installed and in path?${Rst}\n"
     else
-        >&2 printf "${Green}\t[${Cm}] anew found\n"
+        >&2 printf "${Green}\t[${Cm}] anew\tfound\n"
     fi
+
     if ! command -v gotator >/dev/null; then 
         >&2 printf "${Red}\t[${Cross}] gotator not found, is it installed and in path?${Rst}\n"
     else
-        >&2 printf "${Green}\t[${Cm}] gotator found\n"
+        >&2 printf "${Green}\t[${Cm}] gotator\tfound\n"
     fi
+
     if [ ! -d $REGULATOR_PATH ]; then 
         >&2 printf "${Red}\t[${Cross}] regulator not found, is it installed at "$REGULATOR_PATH"${Rst}\n"
     else
-        >&2 printf "${Green}\t[${Cm}] regulator found${Rst}\n"
+        >&2 printf "${Green}\t[${Cm}] regulator\tfound${Rst}\n"
     fi
     exit 1
 }
