@@ -1,6 +1,5 @@
 #!/bin/bash
 trap "exit" INT TERM 
-trap "kill 0" EXIT 
 
 Cross='\xE2\x9D\x8C'
 

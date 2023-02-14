@@ -42,16 +42,16 @@ function print_help()
 {
     printf "Usage: `echo $0 | rev | awk -F '/' '{print $1}' | rev` -d [domain] -f [list of sub-domains] -o [save file]\n"
     printf "Flags:\n"
-    printf "\t-h\tHelp Menu\n"
-    printf "\t-i\tcheck if all the necessary tools are installed\n"
-    printf "\t-d\ttakes a domain name (required)\n"
-    printf "\t-f\ttakes a list of subdomains (required)\n"
-    printf "\t-o\tpath to save file at (required)\n"
+    printf "\t-h Help Menu\n"
+    printf "\t-i check if all the necessary tools are installed\n"
+    printf "\t-d takes a domain name\t\t(required)\n"
+    printf "\t-f takes a list of subdomains\t(required)\n"
+    printf "\t-o path to save file at\t\t(required)\n"
 }
 
 while getopts 'hid:f:o:' opt; do
     case $opt in
-        h) print_help ;;
+        h) print_help; exit ;;
         i) checktools ;;
         d) domain=$OPTARG ;;
         f) file=$OPTARG ;;
@@ -70,20 +70,21 @@ if [ -z "$domain" ] || [ -z "$file" ] || [ -z "$outfile" ]; then
 fi
 
 gotator -sub $file -perm ~/Hacking/wordlists/permutations-general.txt -depth 1 -adv > /tmp/$domain-perms.txt
-printf "${Yellow}[i] generated `wc -l /tmp/$domain-perms.txt | awk '{print $1}'` permutations${Rst}\n"
+>&2 printf "${Yellow}[i] generated `wc -l /tmp/$domain-perms.txt | awk '{print $1}'` permutations${Rst}\n"
 
-cat /tmp/$domain-perms.txt | puredns resolve -r ~/Hacking/wordlists/resolvers.txt | anew $outfile > /tmp/$domain.gotator-new
+cat /tmp/$domain-perms.txt | puredns resolve -r ~/Hacking/wordlists/resolvers.txt | anew $outfile | tee /tmp/$domain.gotator-new
 >&2 printf "${Green}[$Cm] found `wc -l /tmp/$domain.gotator-new | awk '{print $1}'` new valid domains from gotator$Rst\n"
-
-current_dir=`pwd`
 
 
 for i in {1..3}; do
     pushd ~/Hacking/tools/regulator > /dev/null
     python3 main.py $domain $file /tmp/$domain.rules
+
     ./make_brute_list.sh /tmp/$domain.rules /tmp/$domain.brute
+
     popd > /dev/null
-    puredns resolve /tmp/$domain.brute -r ~/Hacking/wordlists/resolvers.txt -q | anew $outfile > /tmp/$domain.valid.new
+
+    puredns resolve /tmp/$domain.brute -r ~/Hacking/wordlists/resolvers.txt -q | anew $outfile | tee /tmp/$domain.valid.new
 
     >&2 printf $Green"[$Cm] iteration ($i), found `wc -l /tmp/$domain.valid.new | awk '{print $1}'` new valid domains from regulator$Rst\n"
 done
