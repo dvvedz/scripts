@@ -11,6 +11,9 @@ function checktools()
 {
     >&2 echo "[!] Checking Dependencies"
     REGULATOR_PATH="$HOME/Hacking/tools/regulator"
+    PERMS_PATH="$HOME/Hacking/wordlists/permutations-general.txt"
+    
+    RESOLVERS_PATH="$HOME/Hacking/wordlists/permutations-general.txt"
 
     if ! command -v puredns >/dev/null; then
         >&2 printf "${Red}\t[${Cross}] puredns not found, is it installed and in path?${Rst}\n"
@@ -34,6 +37,13 @@ function checktools()
         >&2 printf "${Red}\t[${Cross}] regulator not found, is it installed at "$REGULATOR_PATH"${Rst}\n"
     else
         >&2 printf "${Green}\t[${Cm}] regulator\tfound${Rst}\n"
+    fi
+
+    if [ ! -f $PERMS_PATH ] && [ ! -f $RESOLVERS_PATH ]; then 
+        >&2 printf "${Red}\t[${Cross}] files not found:\ncheck that these files exists in the following paths:\
+        $PERMS_PATH, $RESOLVERS_PATH{Rst}\n"
+    else
+        >&2 printf "${Green}\t[${Cm}] files\tfound${Rst}\n"
     fi
     exit 1
 }
@@ -69,7 +79,7 @@ if [ -z "$domain" ] || [ -z "$file" ] || [ -z "$outfile" ]; then
     exit 1
 fi
 
-gotator -sub $file -perm ~/Hacking/wordlists/permutations-general.txt -depth 1 -adv > /tmp/$domain-perms.txt
+gotator -sub $file -perm $PERMS_PATH -depth 1 -adv > /tmp/$domain-perms.txt
 >&2 printf "${Yellow}[i] generated `wc -l /tmp/$domain-perms.txt | awk '{print $1}'` permutations${Rst}\n"
 
 cat /tmp/$domain-perms.txt | puredns resolve -r ~/Hacking/wordlists/resolvers.txt | anew $outfile | tee /tmp/$domain.gotator-new
