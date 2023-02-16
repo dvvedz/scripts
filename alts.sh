@@ -10,6 +10,9 @@ Cross='✘'
 PERMS_PATH="$HOME/Hacking/wordlists/permutations-general.txt"
 REGULATOR_PATH="$HOME/Hacking/tools/regulator"
 RESOLVERS_PATH="$HOME/Hacking/wordlists/resolvers.txt"
+
+curl -s 'https://public-dns.info/nameservers.txt' > $RESOLVERS_PATH
+
 function checktools()
 {
     >&2 echo "[!] Checking Dependencies"
@@ -84,11 +87,13 @@ gotator -sub $file -perm $PERMS_PATH -depth 1 -adv > /tmp/$domain-perms.txt
 cat /tmp/$domain-perms.txt | puredns resolve -r ~/Hacking/wordlists/resolvers.txt | anew $outfile | tee /tmp/$domain.gotator-new
 >&2 printf "${Green}[$Cm] found `wc -l /tmp/$domain.gotator-new | awk '{print $1}'` new valid domains from gotator$Rst\n"
 
+current_dir=""
 
-current_dir=`pwd`
-if [[ $file == "~/"* ]] || [[ $file == "$HOME"* ]] ; then 
-    current_dir=$file 
-fi 
+if [[ $file == "~/"* ]] || [[ $file == "$HOME"* ]] ; then
+    current_dir=$file
+else
+    current_dir=`pwd`/$file
+fi
 
 for i in {1..3}; do
     pushd ~/Hacking/tools/regulator > /dev/null
