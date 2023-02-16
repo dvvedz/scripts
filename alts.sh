@@ -7,13 +7,12 @@ Rst='\033[0m'
 Cm='\xE2\x9C\x94'
 Cross='✘'
 
+PERMS_PATH="$HOME/Hacking/wordlists/permutations-general.txt"
+REGULATOR_PATH="$HOME/Hacking/tools/regulator"
+RESOLVERS_PATH="$HOME/Hacking/wordlists/resolvers.txt"
 function checktools()
 {
     >&2 echo "[!] Checking Dependencies"
-    REGULATOR_PATH="$HOME/Hacking/tools/regulator"
-    PERMS_PATH="$HOME/Hacking/wordlists/permutations-general.txt"
-    
-    RESOLVERS_PATH="$HOME/Hacking/wordlists/permutations-general.txt"
 
     if ! command -v puredns >/dev/null; then
         >&2 printf "${Red}\t[${Cross}] puredns not found, is it installed and in path?${Rst}\n"
@@ -86,9 +85,14 @@ cat /tmp/$domain-perms.txt | puredns resolve -r ~/Hacking/wordlists/resolvers.tx
 >&2 printf "${Green}[$Cm] found `wc -l /tmp/$domain.gotator-new | awk '{print $1}'` new valid domains from gotator$Rst\n"
 
 
+current_dir=`pwd`
+if [[ $file == "~/"* ]] || [[ $file == "$HOME"* ]] ; then 
+    current_dir=$file 
+fi 
+
 for i in {1..3}; do
     pushd ~/Hacking/tools/regulator > /dev/null
-    python3 main.py $domain $file /tmp/$domain.rules
+    python3 main.py $domain $current_dir /tmp/$domain.rules
 
     ./make_brute_list.sh /tmp/$domain.rules /tmp/$domain.brute
 
