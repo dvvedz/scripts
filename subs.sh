@@ -39,3 +39,4 @@ else
     & subfinder -d $domain -all -recursive -silent \
     & oneforall --target $domain --alive False --brute False --req False --fmt json --path /tmp/$domain-oneforall.json run &> /dev/null && wait && cat /tmp/$domain-oneforall.json | jq -r '.[] .subdomain' | uniq
 fi
+wait $!
