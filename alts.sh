@@ -82,9 +82,6 @@ if [ -z "$domain" ] || [ -z "$file" ] || [ -z "$outfile" ]; then
     exit 1
 fi
 
-echo "################# $PERMS_PATH" 
-exit
-
 gotator -sub $file -perm $PERMS_PATH -depth 1 -adv > /tmp/$domain-perms.txt
 >&2 printf "${Yellow}[i] generated `wc -l /tmp/$domain-perms.txt | awk '{print $1}'` permutations${Rst}\n"
 
