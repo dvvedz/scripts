@@ -61,12 +61,13 @@ function print_help()
     printf "\t-o path to save file at\t\t(required)\n"
 }
 
-while getopts 'hid:f:o:' opt; do
+while getopts 'hid:f:o:w:' opt; do
     case $opt in
         h) print_help; exit ;;
         i) checktools ;;
         d) domain=$OPTARG ;;
         f) file=$OPTARG ;;
+        w) wordlist=$OPTARG; PERMS_PATH=$wordlist ;;
         o) outfile=$OPTARG ;;
         ?) print_help; exit 1 ;;
         *) print_help; exit 1 ;;
@@ -80,6 +81,9 @@ if [ -z "$domain" ] || [ -z "$file" ] || [ -z "$outfile" ]; then
     print_help
     exit 1
 fi
+
+echo "################# $PERMS_PATH" 
+exit
 
 gotator -sub $file -perm $PERMS_PATH -depth 1 -adv > /tmp/$domain-perms.txt
 >&2 printf "${Yellow}[i] generated `wc -l /tmp/$domain-perms.txt | awk '{print $1}'` permutations${Rst}\n"
