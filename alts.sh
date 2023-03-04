@@ -56,6 +56,7 @@ function print_help()
     printf "Flags:\n"
     printf "\t-h Help Menu\n"
     printf "\t-i check if all the necessary tools are installed\n"
+    printf "\t-w give custom words instead of default permutation list (get taraget specific key words from subkeyw)\n"
     printf "\t-d takes a domain name\t\t(required)\n"
     printf "\t-f takes a list of subdomains\t(required)\n"
     printf "\t-o path to save file at\t\t(required)\n"
@@ -67,7 +68,7 @@ while getopts 'hid:f:o:w:' opt; do
         i) checktools ;;
         d) domain=$OPTARG ;;
         f) file=$OPTARG ;;
-        w) wordlist=$OPTARG; PERMS_PATH=$wordlist ;;
+        w) words=$OPTARG; PERMS_PATH=$words;;
         o) outfile=$OPTARG ;;
         ?) print_help; exit 1 ;;
         *) print_help; exit 1 ;;
