@@ -1,42 +1,44 @@
 #!/bin/bash
-trap "pkill -P $$"  EXIT
-Cross='\xE2\x9D\x8C'
+trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
-HELP_MESSAGE="Usage: $0 -d [domain] -a [optional, skip amass] | anew all.subs\n"
-if [ -z "$1" ]; then
-    echo -e $HELP_MESSAGE
-    echo ""
-    echo -e "${Cross}\tmissing domain argument at postion \$1"
-    exit 1
-fi
+
+
+HELP_MESSAGE="Usage: `echo $0 | rev | awk -F '/' '{print $1}' | rev` -d [domain] -a [optional, skip amass] | anew all.subs\n"
+
+function print_help()
+{
+    echo $HELP_MESSAGE 
+    printf "\tFlags:\n"
+    printf "\t-h Help Menu\n"
+    printf "\t-d takes a domain name\t\t(required)\n"
+    printf "\t-a skip amass\t\t(optional)\n"
+}
 
 while getopts 'had:' opt; do
     case $opt in
         d) domain=$OPTARG ;;
-        h) echo -e $HELP_MESSAGE; exit ;;
+        h) print_help; exit ;;
         a) amass="false" ;;
-        ?) $HELP_MESSAGE; exit 1 ;;
-        *) $HELP_MESSAGE; exit 1 ;;
+        ?) print_help; exit 1 ;;
+        *) print_help; exit 1 ;;
     esac
 done
 shift $(( OPTIND - 1 ))
 
 if [ -z "$domain" ]; then
-    echo 'Missing -d' >&2
-    echo ''
-    echo $HELP_MESSAGE 
+    echo 'Missing -d'
+    print_help
     exit 1
 fi
 
 if [[ $amass != "false" ]]; then 
-    github-subdomains -d $domain -raw -o /tmp/$domain-github-subdomains \
-    & amass enum -d $domain --passive --silent \
-    & subfinder -d $domain -all -recursive -silent \
-    & oneforall --target $domain --alive False --brute False --req False --fmt json --path /tmp/$domain-oneforall.json run &> /dev/null && wait && cat /tmp/$domain-oneforall.json | jq -r '.[] .subdomain' | uniq
-
+    github-subdomains -d $domain -raw -o /tmp/$domain-github-subdomains || >&2 echo -e "$Cross github-subdomains failed"\
+    & amass enum -d $domain --passive --silent || >&2 echo -e "$Cross amass failed" \
+    & subfinder -d $domain -all -recursive -silent || >&2 echo -e "$Cross subfinder failed" \
+    & oneforall --target $domain --alive False --brute False --req False --fmt json --path /tmp/$domain-oneforall.json run &> /dev/null && wait && cat /tmp/$domain-oneforall.json | jq -r '.[] .subdomain' | awk '!a[$0]++'
 else
-    github-subdomains -d $domain -raw -o /tmp/$domain-github-subdomains \
-    & subfinder -d $domain -all -recursive -silent \
-    & oneforall --target $domain --alive False --brute False --req False --fmt json --path /tmp/$domain-oneforall.json run &> /dev/null && wait && cat /tmp/$domain-oneforall.json | jq -r '.[] .subdomain' | uniq
+    github-subdomains -d $domain -raw -o /tmp/$domain-github-subdomains || >&2 echo -e "$Cross github-subdomains failed" \
+    & subfinder -d $domain -all -recursive -silent || >&2 echo "$Cross github-subdomains failed" \
+    & oneforall --target $domain --alive False --brute False --req False --fmt json --path /tmp/$domain-oneforall.json run &> /dev/null && wait && cat /tmp/$domain-oneforall.json | jq -r '.[] .subdomain' | awk '!a[$0]++'
 fi
-wait $!
+#wait $!
