@@ -1,0 +1,46 @@
+#!/bin/bash
+
+while getopts 'hbl:o:w:' opt; do
+    case $opt in
+        h) print_help; exit ;;
+        l) SUBS=$OPTARG ;;
+        b) BRUTE_LARGE=false ;;
+        ?) print_help; exit 1 ;;
+        *) print_help; exit 1 ;;
+    esac
+done
+
+shift $(( OPTIND - 1 ))
+if [ ! -f $SUBS ]; then
+    echo "$SUBS could not be found, does file exist?"
+    exit 1
+fi
+
+# Grab domain name 
+DOMAIN=$(awk 'NR==1 {print; exit}' $SUBS | awk -F. '{sub(/^[^.]+\./,""); print $1}')
+
+RESOLVERS_PATH="/tmp/resolvers.txt"
+BRUTE_WORDLIST="~/Hacking/wordlists/assetnotes/best-dns-wordlist.txt"
+OUTPUT_ALIVE="$DOMAIN-subs-alive.txt"
+OUTPUT_KEYWORDS="$DOMAIN-keywords.txt"
+
+# Grab latest public dns servers
+curl -s 'https://public-dns.info/nameservers.txt' > $RESOLVERS_PATH
+
+# Brute force subdomains
+if ! $BRUTE_LARGE; then
+    dnsx -d $DOMAIN -w $BRUTE_WORDLIST -r $RESOLVERS_PATH -silent -a -resp | anew $OUTPUT_ALIVE
+else
+    echo "Skipping bruteforcing with large list: $BRUTE_WORDLIST"
+fi
+
+
+# Grab keywords from a list of subdomains
+echo "grabing keywords from list of subdomains..."
+cat $SUBS | sed -e 's/\./\n/g' -e 's/\-/\n/g' -e 's/[0-9]*//g' | sort -u | anew $OUTPUT_KEYWORDS &> /dev/null
+
+# Resolve subdomains generated from keywords
+cat $SUBS | gotator -perm $OUTPUT_KEYWORDS -depth 1 -adv | dnsx -silent -a -resp -r $RESOLVERS_PATH | anew $OUTPUT_ALIVE 
+
+# Generate non target specific alteration and resolve 
+cat $SUBS $OUTPUT_ALIVE | alterx -enrich | dnsx -silent -a -resp -r $RESOLVERS_PATH | anew $OUTPUT_ALIVE
