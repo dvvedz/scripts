@@ -1,4 +1,11 @@
 #!/bin/bash
+function print_help()
+{
+    printf "Usage: `echo $0 | rev | awk -F '/' '{print $1}' | rev` -d [domain] -f [list of sub-domains] -o [save file]\n"
+    printf "Flags:\n"
+    printf "\t-h Help Menu\n"
+    printf "\t-l takes a list of subdomains\t(required)\n"
+}
 
 while getopts 'hbl:o:w:' opt; do
     case $opt in
@@ -15,6 +22,14 @@ if [ ! -f $SUBS ]; then
     echo "$SUBS could not be found, does file exist?"
     exit 1
 fi
+
+if [ -z "$SUBS" ]; then
+    echo 'Missing -l' >&2
+    echo ''
+    print_help
+    exit 1
+fi
+
 
 # Grab domain name 
 DOMAIN=$(awk 'NR==1 {print; exit}' $SUBS | awk -F. '{sub(/^[^.]+\./,""); print $1}')

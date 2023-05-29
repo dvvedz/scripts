@@ -1,8 +1,6 @@
 #!/bin/bash
 trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
-
-
 HELP_MESSAGE="Usage: `echo $0 | rev | awk -F '/' '{print $1}' | rev` -d [domain] -a [optional, skip amass] | anew all.subs\n"
 
 function print_help()
@@ -10,7 +8,7 @@ function print_help()
     echo $HELP_MESSAGE 
     printf "\tFlags:\n"
     printf "\t-h Help Menu\n"
-    printf "\t-d takes a domain name\t\t(required)\n"
+    printf "\t-d takes a domain name\t(required)\n"
     printf "\t-a skip amass\t\t(optional)\n"
 }
 
@@ -23,6 +21,7 @@ while getopts 'had:' opt; do
         *) print_help; exit 1 ;;
     esac
 done
+
 shift $(( OPTIND - 1 ))
 
 if [ -z "$domain" ]; then

@@ -86,27 +86,27 @@ fi
 gotator -sub $file -perm $PERMS_PATH -depth 1 -adv > /tmp/$domain-perms.txt
 >&2 printf "${Yellow}[i] generated `wc -l /tmp/$domain-perms.txt | awk '{print $1}'` permutations${Rst}\n"
 
-cat /tmp/$domain-perms.txt | puredns resolve -r ~/Hacking/wordlists/resolvers.txt | anew $outfile | tee /tmp/$domain.gotator-new
+cat /tmp/$domain-perms.txt | dnsx -silent -resp -r ~/Hacking/wordlists/resolvers.txt | anew $outfile | tee /tmp/$domain.gotator-new
 >&2 printf "${Green}[$Cm] found `wc -l /tmp/$domain.gotator-new | awk '{print $1}'` new valid domains from gotator$Rst\n"
 
-current_dir=""
+# current_dir=""
 
-if [[ $file == "~/"* ]] || [[ $file == "$HOME"* ]] ; then
-    current_dir=$file
-else
-    current_dir=`pwd`/$file
-fi
+# if [[ $file == "~/"* ]] || [[ $file == "$HOME"* ]] ; then
+# current_dir=$file
+# else
+# current_dir=`pwd`/$file
+# fi
 
-for i in {1..3}; do
-    pushd ~/Hacking/tools/regulator > /dev/null
-    python3 main.py $domain $current_dir /tmp/$domain.rules
+# for i in {1..3}; do
+    # pushd ~/Hacking/tools/regulator > /dev/null
+    # python3 main.py $domain $current_dir /tmp/$domain.rules
 
-    ./make_brute_list.sh /tmp/$domain.rules /tmp/$domain.brute
+    # ./make_brute_list.sh /tmp/$domain.rules /tmp/$domain.brute
 
-    popd > /dev/null
+    # popd > /dev/null
 
-    puredns resolve /tmp/$domain.brute -r ~/Hacking/wordlists/resolvers.txt -q | anew $outfile | tee /tmp/$domain.valid.new
+   # dnsx -silent -resp -l /tmp/$domain.brute -r ~/Hacking/wordlists/resolvers.txt -q | anew $outfile | tee /tmp/$domain.valid.new
 
-    >&2 printf $Green"[$Cm] iteration ($i), found `wc -l /tmp/$domain.valid.new | awk '{print $1}'` new valid domains from regulator$Rst\n"
-done
+    # >&2 printf $Green"[$Cm] iteration ($i), found `wc -l /tmp/$domain.valid.new | awk '{print $1}'` new valid domains from regulator$Rst\n"
+# done
 
