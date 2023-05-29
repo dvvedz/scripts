@@ -57,4 +57,4 @@ cat $SUBS | sed -e 's/\./\n/g' -e 's/\-/\n/g' -e 's/[0-9]*//g' | sort -u | anew 
 gotator -sub $SUBS -perm $OUTPUT_KEYWORDS -depth 1 -adv | dnsx -silent -a -resp -r $RESOLVERS_PATH | anew $OUTPUT_ALIVE 
 
 # Generate non target specific alteration and resolve 
-cat $SUBS $OUTPUT_ALIVE | alterx -enrich | dnsx -silent -a -resp -r $RESOLVERS_PATH | anew $OUTPUT_ALIVE
+cat $SUBS | alterx -silent | dnsx -silent -a -resp -r $RESOLVERS_PATH | anew $OUTPUT_ALIVE
