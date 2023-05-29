@@ -31,8 +31,7 @@ if [ ! -f $SUBS ]; then
 fi
 
 # Grab domain name 
-DOMAIN_S=$(awk 'NR==1 {print; exit}' $SUBS)
-DOMAIN="${DOMAIN_S%.*}"
+DOMAIN=$(awk 'NR==1 {print; exit}' $SUBS | awk -F. '{print $(NF-1)}')
 
 RESOLVERS_PATH="/tmp/resolvers.txt"
 BRUTE_WORDLIST="~/Hacking/wordlists/assetnotes/best-dns-wordlist.txt"
