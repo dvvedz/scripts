@@ -1,11 +1,12 @@
 #!/bin/bash
 function print_help()
 {
-    printf "Usage: `echo $0 | rev | awk -F '/' '{print $1}' | rev` -d [domain] -f [list of sub-domains] -o [save file]\n"
+    printf "Usage: `echo $0 | rev | awk -F '/' '{print $1}' | rev` -l [file with subdomains]\n"
     printf "Flags:\n"
     printf "\t-h Help Menu\n"
     printf "\t-l takes a list of subdomains\t(required)\n"
 }
+
 
 while getopts 'hbl:o:w:' opt; do
     case $opt in
@@ -18,18 +19,16 @@ while getopts 'hbl:o:w:' opt; do
 done
 
 shift $(( OPTIND - 1 ))
-if [ ! -f $SUBS ]; then
-    echo "$SUBS could not be found, does file exist?"
-    exit 1
-fi
-
 if [ -z "$SUBS" ]; then
-    echo 'Missing -l' >&2
-    echo ''
+    # If the file path was not provided as a flag, read it from stdin
     print_help
     exit 1
 fi
 
+if [ ! -f $SUBS ]; then
+    echo "$SUBS could not be found, does file exist?"
+    exit 1
+fi
 
 # Grab domain name 
 DOMAIN=$(awk 'NR==1 {print; exit}' $SUBS | awk -F. '{sub(/^[^.]+\./,""); print $1}')
@@ -52,10 +51,10 @@ fi
 
 # Grab keywords from a list of subdomains
 echo "grabing keywords from list of subdomains..."
-cat $SUBS | sed -e 's/\./\n/g' -e 's/\-/\n/g' -e 's/[0-9]*//g' | sort -u | anew $OUTPUT_KEYWORDS &> /dev/null
+$SUBS | sed -e 's/\./\n/g' -e 's/\-/\n/g' -e 's/[0-9]*//g' | sort -u | anew $OUTPUT_KEYWORDS &> /dev/null
 
 # Resolve subdomains generated from keywords
-cat $SUBS | gotator -perm $OUTPUT_KEYWORDS -depth 1 -adv | dnsx -silent -a -resp -r $RESOLVERS_PATH | anew $OUTPUT_ALIVE 
+# cat $SUBS | gotator -perm $OUTPUT_KEYWORDS -depth 1 -adv | dnsx -silent -a -resp -r $RESOLVERS_PATH | anew $OUTPUT_ALIVE 
 
 # Generate non target specific alteration and resolve 
-cat $SUBS $OUTPUT_ALIVE | alterx -enrich | dnsx -silent -a -resp -r $RESOLVERS_PATH | anew $OUTPUT_ALIVE
+# cat $SUBS $OUTPUT_ALIVE | alterx -enrich | dnsx -silent -a -resp -r $RESOLVERS_PATH | anew $OUTPUT_ALIVE
