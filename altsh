@@ -51,7 +51,7 @@ fi
 
 # Grab keywords from a list of subdomains
 echo "grabing keywords from list of subdomains..."
-$SUBS | sed -e 's/\./\n/g' -e 's/\-/\n/g' -e 's/[0-9]*//g' | sort -u | anew $OUTPUT_KEYWORDS &> /dev/null
+cat $SUBS | sed -e 's/\./\n/g' -e 's/\-/\n/g' -e 's/[0-9]*//g' | sort -u | anew $OUTPUT_KEYWORDS &> /dev/null
 
 # Resolve subdomains generated from keywords
 gotator -sub $SUBS -perm $OUTPUT_KEYWORDS -depth 1 -adv | dnsx -silent -a -resp -r $RESOLVERS_PATH | anew $OUTPUT_ALIVE 
