@@ -49,7 +49,7 @@ else
 fi
 
 # Grab keywords from a list of subdomains
-cat $SUBS | sh skeywords.sh | sort -u | anew $OUTPUT_KEYWORDS &> /dev/null
+cat $SUBS | skeywords | sort -u | anew $OUTPUT_KEYWORDS &> /dev/null
 
 # Resolve subdomains generated from keywords
 gotator -sub $SUBS -perm $OUTPUT_KEYWORDS -silent -depth 1 -adv | dnsx -silent -a -resp -r $RESOLVERS_PATH
