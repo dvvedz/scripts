@@ -1,8 +1,6 @@
 #!/bin/bash
 
 while read -r line; do
-  #echo $line | awk -F "." '{print $1}' | awk -F '-' '{print $0"\n"$1"\n"$2"\n"$3"\n"$4"\n"$5}' 
-  echo $line | awk -F'.' '{split($1,a,"-"); for(i=1;i<=length(a);i++) print a[i]}'
-
+  echo $line | sed -e 's/\./\n/g' -e 's/\-/\n/g' -e 's/[0-9]*//g'
 done < /dev/stdin | sort -u 
 
