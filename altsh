@@ -21,12 +21,12 @@ done
 shift $(( OPTIND - 1 ))
 if [ -z "$SUBS" ]; then
     # If the file path was not provided as a flag, read it from stdin
-    print_help
+    print_help >&2
     exit 1
 fi
 
 if [ ! -f $SUBS ]; then
-    echo "$SUBS could not be found, does file exist?"
+    printf "$SUBS could not be found, does file exist?\n" >&2
     exit 1
 fi
 
@@ -40,21 +40,25 @@ OUTPUT_KEYWORDS="$DOMAIN-keywords.txt"
 
 # Grab latest public dns servers
 curl -s 'https://public-dns.info/nameservers.txt' > $RESOLVERS_PATH
-
+{
 # Brute force subdomains
 if ! $BRUTE_LARGE; then
-    dnsx -d $DOMAIN -w $BRUTE_WORDLIST -r $RESOLVERS_PATH -silent -a -resp | anew $OUTPUT_ALIVE
+    dnsx -d $DOMAIN -w $BRUTE_WORDLIST -r $RESOLVERS_PATH -silent -a -resp 
 else
-    echo "Skipping bruteforcing with large list: $BRUTE_WORDLIST"
+    printf "Skipping bruteforcing with large list: $BRUTE_WORDLIST\n" >&2
 fi
 
-
 # Grab keywords from a list of subdomains
-echo "grabing keywords from list of subdomains..."
+printf "grabing keywords from list of subdomains..." >&2
 cat $SUBS | sed -e 's/\./\n/g' -e 's/\-/\n/g' -e 's/[0-9]*//g' | sort -u | anew $OUTPUT_KEYWORDS &> /dev/null
 
 # Resolve subdomains generated from keywords
-gotator -sub $SUBS -perm $OUTPUT_KEYWORDS -silent -depth 1 -adv | dnsx -silent -a -resp -r $RESOLVERS_PATH | anew $OUTPUT_ALIVE 
+gotator -sub $SUBS -perm $OUTPUT_KEYWORDS -silent -depth 1 -adv | dnsx -silent -a -resp -r $RESOLVERS_PATH
 
 # Generate non target specific alteration and resolve 
-cat $SUBS | alterx -enrich -silent | dnsx -silent -a -resp -r $RESOLVERS_PATH | anew $OUTPUT_ALIVE
+cat $SUBS | alterx -enrich -silent | dnsx -silent -a -resp -r $RESOLVERS_PATH 
+}
+
+# TODO:
+# + find domains from archives with gau or xnlinkfinder
+# + Find domains from vhost fuzzing
