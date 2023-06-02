@@ -35,7 +35,7 @@ DOMAIN=$(awk 'NR==1 {print; exit}' $SUBS | awk -F. '{print $(NF-1)}')
 
 RESOLVERS_PATH="/tmp/resolvers.txt"
 BRUTE_WORDLIST="~/Hacking/wordlists/assetnotes/best-dns-wordlist.txt"
-OUTPUT_ALIVE="$DOMAIN-subs-alive.txt"
+OUTPUT_ALIVE="$DOMAIN-alive.subs"
 OUTPUT_KEYWORDS="$DOMAIN-keywords.txt"
 
 # Grab latest public dns servers
@@ -43,7 +43,7 @@ curl -s 'https://public-dns.info/nameservers.txt' > $RESOLVERS_PATH
 {
 # Brute force subdomains
 if ! $BRUTE_LARGE; then
-    dnsx -d $DOMAIN -w $BRUTE_WORDLIST -r $RESOLVERS_PATH -silent -a -resp 
+    puredns bruteforce $BRUTE_WORDLIST -q -r $RESOLVERS_PATH $DOMAIN
 else
     printf "Skipping bruteforcing with large list: $BRUTE_WORDLIST\n" >&2
 fi
@@ -52,10 +52,10 @@ fi
 cat $SUBS | skeywords | sort -u | anew $OUTPUT_KEYWORDS &> /dev/null
 
 # Resolve subdomains generated from keywords
-gotator -sub $SUBS -perm $OUTPUT_KEYWORDS -silent -depth 1 -adv | dnsx -silent -a -resp -r $RESOLVERS_PATH
+gotator -sub $SUBS -perm $OUTPUT_KEYWORDS -silent -depth 1 -adv | puredns resolve -q -r $RESOLVERS_PATH
 
 # Generate non target specific alteration and resolve 
-cat $SUBS | alterx -enrich -silent | dnsx -silent -a -resp -r $RESOLVERS_PATH 
+cat $SUBS | alterx -enrich -silent | puredns resolve -q -r $RESOLVERS_PATH
 }
 
 # TODO:
