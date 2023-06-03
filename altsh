@@ -62,7 +62,7 @@ cat $SUBS | skeywords | sort -u | anew $OUTPUT_KEYWORDS &> /dev/null
 # Resolve subdomains generated from keywords
 printf "${Yellow}[i] Generating alertations from $OUTPUT_KEYWORDS${Rst}\n" >&2
 gotator -sub $SUBS -perm $OUTPUT_KEYWORDS -silent -depth 1 -adv \
-    && printf "${Yellow}[i] Resolving generated alterations using keywords...${Rst}\n" >&2 
+    && printf "${Yellow}[i] Resolving generated alterations using keywords...${Rst}\n" >&2 \
     | puredns resolve -q -r $RESOLVERS_PATH
 
 # Generate non target specific alteration and resolve 
