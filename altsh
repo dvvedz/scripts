@@ -8,7 +8,7 @@ Cross='✘'
 
 function print_help()
 {
-    printf "Usage: `echo $0 | rev | awk -F '/' '{print $1}' | rev` -l [file with subdomains]\n"
+    printf "Usage: `echo $0 | rev | awk -F '/' '{print $1}' | rev` -l [file with subdomains] | anew domain-alive.subs\n"
     printf "Flags:\n"
     printf "\t-h Help Menu\n"
     printf "\t-l takes a list of subdomains\t(required)\n"
@@ -64,7 +64,6 @@ printf "${Yellow}[i] Generating alertations from $OUTPUT_KEYWORDS${Rst}\n" >&2
 gotator -sub $SUBS -perm $OUTPUT_KEYWORDS -silent -depth 1 -adv | puredns resolve -q -r $RESOLVERS_PATH
 
 # Generate non target specific alteration and resolve 
-printf "${Yellow}[i] Generating alertations with alterx${Rst}\n" >&2
 cat $SUBS | alterx -enrich -silent | puredns resolve -q -r $RESOLVERS_PATH
 }
 
