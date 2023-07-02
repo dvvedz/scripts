@@ -60,11 +60,11 @@ fi
 cat $SUBS | skeywords | sort -u | anew $OUTPUT_KEYWORDS &> /dev/null
 
 # Resolve subdomains generated from keywords
-printf "${Yellow}[i] Resolving alertations generated from keywords - $OUTPUT_KEYWORDS${Rst}\n" #>&2
+printf "${Yellow}[i] Resolving alertations generated from keywords - $OUTPUT_KEYWORDS${Rst}\n" >&2
 gotator -sub $SUBS -perm $OUTPUT_KEYWORDS -silent -depth 1 -adv | puredns resolve -q -r $RESOLVERS_PATH
 
 # Generate non target specific alteration and resolve 
-printf "${Yellow}[i] Resolve alterations from alterx - $OUTPUT_KEYWORDS${Rst}\n" #>&2
+printf "${Yellow}[i] Resolve alterations from alterx - $OUTPUT_KEYWORDS${Rst}\n" >&2
 cat $SUBS | alterx -enrich -silent | puredns resolve -q -r $RESOLVERS_PATH
 }
 
