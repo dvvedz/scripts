@@ -34,10 +34,10 @@ if [[ $amass != "false" ]]; then
     github-subdomains -d $domain -raw -o /tmp/$domain-github-subdomains || >&2 echo -e "$Cross github-subdomains failed"\
     & amass enum -d $domain --passive --silent || >&2 echo -e "$Cross amass failed" \
     & subfinder -d $domain -all -recursive -silent || >&2 echo -e "$Cross subfinder failed" \
-    & oneforall --target $domain --alive False --brute False --req False --fmt json --path /tmp/$domain-oneforall.json run &> /dev/null && wait && cat /tmp/$domain-oneforall.json | jq -r '.[] .subdomain' | awk '!a[$0]++'
+    #& oneforall --target $domain --alive False --brute False --req False --fmt json --path /tmp/$domain-oneforall.json run &> /dev/null && wait && cat /tmp/$domain-oneforall.json | jq -r '.[] .subdomain' | awk '!a[$0]++'
 else
     github-subdomains -d $domain -raw -o /tmp/$domain-github-subdomains || >&2 echo -e "$Cross github-subdomains failed" \
     & subfinder -d $domain -all -recursive -silent || >&2 echo "$Cross github-subdomains failed" \
-    & oneforall --target $domain --alive False --brute False --req False --fmt json --path /tmp/$domain-oneforall.json run &> /dev/null && wait && cat /tmp/$domain-oneforall.json | jq -r '.[] .subdomain' | awk '!a[$0]++'
+    #& oneforall --target $domain --alive False --brute False --req False --fmt json --path /tmp/$domain-oneforall.json run &> /dev/null && wait && cat /tmp/$domain-oneforall.json | jq -r '.[] .subdomain' | awk '!a[$0]++'
 fi
 #wait $!
