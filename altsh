@@ -42,19 +42,18 @@ DOMAIN=$(awk 'NR==1 {print; exit}' $SUBS | awk -F. '{print $(NF-1)}')
 
 RESOLVERS_PATH="/tmp/resolvers.txt"
 BRUTE_WORDLIST="~/Hacking/wordlists/assetnotes/best-dns-wordlist.txt"
-OUTPUT_ALIVE="$DOMAIN-alive.subs"
-OUTPUT_KEYWORDS="$DOMAIN.keywords"
+OUTPUT_KEYWORDS="subs.keywords"
 
 # Grab latest public dns servers
 curl -s 'https://public-dns.info/nameservers.txt' > $RESOLVERS_PATH
 {
 # Brute force subdomains
-if ! $BRUTE_LARGE; then
-    printf "${Yellow}[i] bruteforcing with large list: $BRUTE_WORDLIST${Rst}\n" >&2
-    puredns bruteforce $BRUTE_WORDLIST -q -r $RESOLVERS_PATH $DOMAIN
-else
-    printf "${Yellow}[i] Skipping bruteforcing with large list: $BRUTE_WORDLIST${Rst}\n" >&2
-fi
+# if ! $BRUTE_LARGE; then
+#     printf "${Yellow}[i] bruteforcing with large list: $BRUTE_WORDLIST${Rst}\n" >&2
+#     puredns bruteforce $BRUTE_WORDLIST -q -r $RESOLVERS_PATH $DOMAIN
+# else
+#     printf "${Yellow}[i] Skipping bruteforcing with large list: $BRUTE_WORDLIST${Rst}\n" >&2
+# fi
 
 # Grab keywords from a list of subdomains
 cat $SUBS | skeywords | sort -u | anew $OUTPUT_KEYWORDS &> /dev/null
@@ -64,8 +63,11 @@ printf "${Yellow}[i] Resolving alertations generated from keywords - $OUTPUT_KEY
 gotator -sub $SUBS -perm $OUTPUT_KEYWORDS -silent -depth 1 -adv | puredns resolve -q -r $RESOLVERS_PATH
 
 # Generate non target specific alteration and resolve 
-printf "${Yellow}[i] Resolve alterations from alterx - $OUTPUT_KEYWORDS${Rst}\n" >&2
+printf "${Yellow}[i] Resolve alterations from alterx${Rst}\n" >&2
 cat $SUBS | alterx -enrich -silent | puredns resolve -q -r $RESOLVERS_PATH
+
+printf "${Yellow}[i] Resolve alterations from dngen${Rst}\n" >&2
+cat $SUBS | dnsgen - | puredns resolve -q -r $RESOLVERS_PATH
 }
 
 # TODO:
