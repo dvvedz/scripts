@@ -47,6 +47,7 @@ OUTPUT_KEYWORDS="subs.keywords"
 # Grab latest public dns servers
 curl -s 'https://public-dns.info/nameservers.txt' > $RESOLVERS_PATH
 {
+    
 # Brute force subdomains
 if ! $BRUTE_LARGE; then
     printf "${Yellow}[i] bruteforcing with large list: $BRUTE_WORDLIST${Rst}\n" >&2
