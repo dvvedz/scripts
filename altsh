@@ -47,7 +47,6 @@ OUTPUT_KEYWORDS="subs.keywords"
 # Grab latest public dns servers
 curl -s 'https://public-dns.info/nameservers.txt' > $RESOLVERS_PATH
 {
-    
 # Brute force subdomains
 if ! $BRUTE_LARGE; then
     printf "${Yellow}[i] bruteforcing with large list: $BRUTE_WORDLIST${Rst}\n" >&2
@@ -57,15 +56,36 @@ else
 fi
 
 # Grab keywords from a list of subdomains
-cat $SUBS | skeywords | sort -u | anew $OUTPUT_KEYWORDS &> /dev/null
+# cat $SUBS | skeywords | sort -u | anew $OUTPUT_KEYWORDS &> /dev/null
 
 # Resolve subdomains generated from keywords
-printf "${Yellow}[i] Resolving alertations generated from keywords - $OUTPUT_KEYWORDS${Rst}\n" >&2
-gotator -sub $SUBS -perm $OUTPUT_KEYWORDS -silent -depth 1 -adv | puredns resolve -r $RESOLVERS_PATH
+# printf "${Yellow}[i] Resolving alertations generated from keywords - $OUTPUT_KEYWORDS${Rst}\n" >&2
+# gotator -sub $SUBS -perm $OUTPUT_KEYWORDS -silent -depth 1 -adv | puredns resolve -r $RESOLVERS_PATH
 
-# Generate non target specific alteration and resolve 
-printf "${Yellow}[i] Resolve alterations from alterx${Rst}\n" >&2
-cat $SUBS | alterx -enrich -silent | puredns resolve -r $RESOLVERS_PATH
+current_dir=""
+
+if [[ $file == "~/"* ]] || [[ $file == "$HOME"* ]] ; then
+    current_dir=$file
+else
+    current_dir=`pwd`/$file
+fi
+
+for i in {1..3}; do
+    pushd ~/Hacking/tools/regulator > /dev/null
+    python3 main.py $domain $current_dir /tmp/$domain.rules
+
+    ./make_brute_list.sh /tmp/$domain.rules /tmp/$domain.brute
+
+    popd > /dev/null
+
+    cat /tmp/$domain.brute | puredns resolve -q -r $RESOLVERS_PATH | anew $outfile | tee /tmp/$domain.valid.new
+
+    >&2 printf $Green"[$Cm] iteration ($i), found `wc -l /tmp/$domain.valid.new | awk '{print $1}'` new valid domains from regulator$Rst\n"
+done
+
+# Generate target specific alteration and resolve 
+# printf "${Yellow}[i] Resolve alterations from alterx${Rst}\n" >&2
+# cat $SUBS | alterx -enrich -silent | puredns resolve -r $RESOLVERS_PATH
 
 # printf "${Yellow}[i] Resolve alterations from dngen${Rst}\n" >&2
 # cat $SUBS | dnsgen - | puredns resolve -q -r $RESOLVERS_PATH
