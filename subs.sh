@@ -66,7 +66,7 @@ if [[ $long != "false" ]]; then
 else
     (
     github-subdomains -d $domain -raw -o /tmp/$domain-github-subdomains || >&2 echo -e "$Cross github-subdomains failed" \
-    & subfinder -d $domain -all -recursive -silent || >&2 echo "$Cross github-subdomains failed"
+    & subfinder -d $domain -all -recursive -silent || >&2 echo "$Cross github-subdomains failed" \
     ; bbot -t $domain -f subdomain-enum -rf passive -c modules.massdns.max_resolvers=5000 --output-module json --yes -s 2>/dev/null | jq -r 'select(.type=="DNS_NAME") | .data'
     )
 fi
