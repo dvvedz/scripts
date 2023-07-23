@@ -1,7 +1,32 @@
 #!/bin/bash
-trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
+# trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
+
+set -eo pipefail
 
 HELP_MESSAGE="Usage: `echo $0 | rev | awk -F '/' '{print $1}' | rev` -d [domain] -a [optional, skip amass] | anew all.subs\n"
+
+# Check if tools are installed
+function check_tools()
+{
+    if ! command -v github-subdomains >/dev/null 2>&1; then
+        echo "github-subdomains is not installed"
+        exit
+    fi
+    if ! command -v amass >/dev/null 2>&1; then
+        echo "amass is not installed"
+        exit
+    fi
+    if ! command -v subfinder >/dev/null 2>&1; then
+        echo "subfinder is not installed"
+        exit
+    fi
+    if ! command -v bbot >/dev/null 2>&1; then
+        echo "bbot is not installed"
+        exit
+    fi
+}
+
+check_tools
 
 function print_help()
 {
@@ -41,8 +66,8 @@ if [[ $long != "false" ]]; then
 else
     (
     github-subdomains -d $domain -raw -o /tmp/$domain-github-subdomains || >&2 echo -e "$Cross github-subdomains failed" \
-    & subfinder -d $domain -all -recursive -silent || >&2 echo "$Cross github-subdomains failed" \
-    #& oneforall --target $domain --alive False --brute False --req False --fmt json --path /tmp/$domain-oneforall.json run &> /dev/null && wait && cat /tmp/$domain-oneforall.json | jq -r '.[] .subdomain' | awk '!a[$0]++'
+    & subfinder -d $domain -all -recursive -silent || >&2 echo "$Cross github-subdomains failed"
+    ; bbot -t $domain -f subdomain-enum -rf passive -c modules.massdns.max_resolvers=5000 --output-module json --yes -s 2>/dev/null | jq -r 'select(.type=="DNS_NAME") | .data'
     )
 fi
 #wait $!

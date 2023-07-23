@@ -20,7 +20,6 @@ while getopts 'hbl:o:w:' opt; do
         h) print_help; exit ;;
         l) SUBS=$OPTARG ;;
         b) BRUTE_LARGE=false ;;
-        r) SINGLE_DOMAIN=false ;;
         ?) print_help; exit 1 ;;
         *) print_help; exit 1 ;;
     esac
