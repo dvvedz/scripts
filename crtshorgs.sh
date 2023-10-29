@@ -9,5 +9,5 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-curl -s 'https://crt.sh/?O=indeed&output=json' | jq -r '.[] .common_name' | uniq | unfurl -u apexes
+curl -s "https://crt.sh/?O=$1&output=json" | jq -r '.[] .common_name' | uniq | unfurl -u apexes
 

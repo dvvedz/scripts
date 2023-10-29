@@ -55,19 +55,20 @@ if [ -z "$domain" ]; then
     exit 1
 fi
 
-if [[ $long != "false" ]]; then 
-    (
-    github-subdomains -d $domain -raw -o /tmp/$domain-github-subdomains || >&2 echo -e "$Cross github-subdomains failed"\
-    & amass enum -d $domain --passive --silent || >&2 echo -e "$Cross amass failed" \
-    & subfinder -d $domain -all -recursive -silent || >&2 echo -e "$Cross subfinder failed" \
-    ; bbot -t $domain -f subdomain-enum -rf passive -c modules.massdns.max_resolvers=1000 --output-module json --yes -s 2>/dev/null | jq -r 'select(.type=="DNS_NAME") | .data'
-    )
-    #& oneforall --target $domain --alive False --brute False --req False --fmt json --path /tmp/$domain-oneforall.json run &> /dev/null && wait && cat /tmp/$domain-oneforall.json | jq -r '.[] .subdomain' | awk '!a[$0]++'
-else
-    (
-    github-subdomains -d $domain -raw -o /tmp/$domain-github-subdomains || >&2 echo -e "$Cross github-subdomains failed" \
-    & subfinder -d $domain -all -recursive -silent || >&2 echo "$Cross github-subdomains failed" \
-    ; bbot -t $domain -f subdomain-enum -rf passive -c modules.massdns.max_resolvers=1000 --output-module json --yes -s 2>/dev/null | jq -r 'select(.type=="DNS_NAME") | .data'
+echo $domain
+ if [[ $long != "false" ]]; then 
+     (
+     github-subdomains -d $domain -raw -o /tmp/$domain-github-subdomains || >&2 echo -e "$Cross github-subdomains failed"\
+     & amass enum -d $domain --passive --silent || >&2 echo -e "$Cross amass failed" \
+     & subfinder -d $domain -all -recursive -silent || >&2 echo -e "$Cross subfinder failed" \
+     ; bbot -t $domain -f subdomain-enum -rf passive -c modules.massdns.max_resolvers=1000 --output-module json --yes -s 2>/dev/null | jq -r 'select(.type=="DNS_NAME") | .data' || >&2 echo -e "$Cross bbot failed"
+     )
+     #& oneforall --target $domain --alive False --brute False --req False --fmt json --path /tmp/$domain-oneforall.json run &> /dev/null && wait && cat /tmp/$domain-oneforall.json | jq -r '.[] .subdomain' | awk '!a[$0]++'
+ else
+     (
+     github-subdomains -d $domain -raw -o /tmp/$domain-github-subdomains || >&2 echo -e "$Cross github-subdomains failed" \
+     & subfinder -d $domain -all -recursive -silent || >&2 echo "$Cross github-subdomains failed" \
+     ; bbot -t $domain -f subdomain-enum -rf passive -c modules.massdns.max_resolvers=1000 --output-module json --yes -s 2>/dev/null | jq -r 'select(.type=="DNS_NAME") | .data' || >&2 echo -e "$Cross bbot failed"
     )
 fi
 #wait $!
