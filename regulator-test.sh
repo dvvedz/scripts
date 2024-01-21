@@ -59,7 +59,7 @@ else
 fi
 
 for apex in `cat subs.test | unfurl apexes |  sort -u |  grep -vwE '\{3\}' | sed 's/^\.//' | awk NF`; do
-   echo "running regulator on $apex..."
+   # echo "running regulator on $apex..."
 
    for i in {1..3}; do
        pushd ~/Hacking/tools/regulator > /dev/null
