@@ -49,8 +49,8 @@ cleanup() {
    pkill -P $$
    exit 1
 }
-trap cleanup SIGINT
 
+trap cleanup SIGINT
 
 if [[ $file == "~/"* ]] || [[ $file == "$HOME"* ]] ; then
     hosts_file=$file
@@ -58,20 +58,20 @@ else
     hosts_file=`pwd`/$file
 fi
 
-for apex in `cat subs.test | unfurl apexes |  sort -u |  grep -vwE '\{3\}' | sed 's/^\.//' | awk NF`; do
+for apex in `cat subs.test | unfurl apexes | sort -u |  grep -vwE '\{3\}' | sed 's/^\.//' | awk NF`; do
    # echo "running regulator on $apex..."
 
    for i in {1..3}; do
        pushd ~/Hacking/tools/regulator > /dev/null
 
-       python3 main.py $apex $hosts_file /tmp/$domain.rules
+       python3 main.py $apex $hosts_file /tmp/$apex.rules
 
-       ./make_brute_list.sh /tmp/$domain.rules /tmp/$domain.brute
+       ./make_brute_list.sh /tmp/$apex.rules /tmp/$apex.brute
 
        popd > /dev/null
 
        # cat /tmp/$domain.brute
-       puredns resolve -r $resolvers /tmp/$domain.brute # | anew $outfile | tee /tmp/$domain.valid.new
+       # puredns resolve -r $resolvers /tmp/$domain.brute # | anew $outfile | tee /tmp/$domain.valid.new
 
        # >&2 printf $Green"[$Cm] iteration ($i), found `wc -l /tmp/$domain.valid.new | awk '{print $1}'` new valid domains from regulator$Rst\n"
    done
