@@ -1,0 +1,56 @@
+#!/bin/bash
+
+projectArg=$1
+domainArg=$2
+# domainArgReplaced=`echo $domainArg | sed "s/\./-/g"`
+brutewordlist="$HOME/Hacking/wordlists/mysubslist.txt"
+
+if [ -z $projectArg ] || [ -z $domainArg ]; then
+    >&2 echo "Project(\$1) or/and domain(\$2) is not set"
+    exit
+fi
+
+# Find subdomains
+
+# With scraping
+# With bruteforce
+# With cloudrecon
+# With alterations
+
+if test "`find /tmp/resolvers.txt -mtime +1`"; then
+    >&2 echo "getting fresh resolvers after 24h"
+    dnsvalidator -tL https://public-dns.info/nameservers.txt -threads 1000 -o /tmp/resolvers.txt > /dev/null
+fi
+
+>&2 echo "running fknsubs"
+fknsubs -domain $domainArg \
+    | fkndb -project $projectArg -add subs -src fknsubs \
+    | dnsx -json -silent \
+    | fkndb -project $projectArg -add subs-resolved \
+    | httpx -json -silent \
+    | fkndb -project $projectArg -add subs-probed
+
+>&2 echo "running bruteforce"
+# shuffledns -d $domainArg -r /tmp/resolvers.txt -w $brutewordlist -mode bruteforce -silent -t 1500
+puredns bruteforce $brutewordlist $domainArg -r /tmp/resolvers.txt -q \
+    | fkndb -project $projectArg -add subs -src bruteforce \
+    | dnsx -json -silent \
+    | fkndb -project $projectArg -add subs-resolved \
+    | httpx -json -silent \
+    | fkndb -project $projectArg -add subs-probed
+
+
+# get all subdomina matching domain arg
+fkndb -project $projectArg -get subs -json | jq .SubdomainName -r | grep -F "$domainArg" > /tmp/$domainArg.subs
+
+# | shuffledns -d $domainArg -r /tmp/resolvers.txt -mode resolve -silent -t 2000 \
+>&2 echo "Brute forcing gotator alts"
+gotator -mindup -sub /tmp/$domainArg.subs -silent -fast -depth 1 -numbers 9 -adv \
+    | puredns resolve -r /tmp/resolvers.txt --wildcard-batch 1000000 -q \
+    | fkndb -project $projectArg -add subs -src alts \
+    | dnsx -json -silent \
+    | fkndb -project $projectArg -add subs-resolved \
+    | httpx -json -silent \
+    | fkndb -project $projectArg -add subs-probed
+
+# Run other stuff
