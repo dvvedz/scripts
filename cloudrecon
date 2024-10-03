@@ -1,9 +1,19 @@
 #!/bin/bash
 
-{
-curl -s 'https://kaeferjaeger.gay/sni-ip-ranges/amazon/ipv4_merged_sni.txt' & \
-curl -s 'https://kaeferjaeger.gay/sni-ip-ranges/digitalocean/ipv4_merged_sni.txt' & \
-curl -s 'https://kaeferjaeger.gay/sni-ip-ranges/google/ipv4_merged_sni.txt' & \
-curl -s 'https://kaeferjaeger.gay/sni-ip-ranges/microsoft/ipv4_merged_sni.txt' & \
-curl -s 'https://kaeferjaeger.gay/sni-ip-ranges/oracle/ipv4_merged_sni.txt'
-} | grep -oE '\[.*?\]' | sed 's/[][]//g' | tr ' ' '\n' | grep -v "*"
+if ! test -f /tmp/cloudrangesdata.txt || test "`find /tmp/cloudrangesdata.txt -mtime +2`"; then
+    {
+        curl -s 'https://kaeferjaeger.gay/sni-ip-ranges/amazon/ipv4_merged_sni.txt' & \
+        curl -s 'https://kaeferjaeger.gay/sni-ip-ranges/digitalocean/ipv4_merged_sni.txt' & \
+        curl -s 'https://kaeferjaeger.gay/sni-ip-ranges/google/ipv4_merged_sni.txt' & \
+        curl -s 'https://kaeferjaeger.gay/sni-ip-ranges/microsoft/ipv4_merged_sni.txt' & \
+        curl -s 'https://kaeferjaeger.gay/sni-ip-ranges/oracle/ipv4_merged_sni.txt'
+    } | grep -oE '\[.*?\]' | sed 's/[][]//g' | tr ' ' '\n' | grep -v "*" > /tmp/cloudrangesdata.txt
+fi
+
+if ! [ -n "$1" ]; then
+    while read line; do 
+        cat /tmp/cloudrangesdata.txt | grep -E "\\.$line$"
+    done < "${1:-/dev/stdin}" 
+else
+    cat /tmp/cloudrangesdata.txt | grep -E "\\.$1$"
+fi
