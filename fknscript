@@ -27,7 +27,7 @@ fknsubs -domain $domainArg \
     | fkndb -project $projectArg -add subs -src fknsubs \
     | dnsx -json -silent \
     | fkndb -project $projectArg -add subs-resolved \
-    | httpx -json -silent \
+    | httpx -json -silent -ports 80,8080,443,8443,4443,8888 \
     | fkndb -project $projectArg -add subs-probed
 
 >&2 echo "[?] running bruteforce"
@@ -36,7 +36,7 @@ puredns bruteforce $brutewordlist $domainArg -r /tmp/resolvers.txt -q \
     | fkndb -project $projectArg -add subs -src bruteforce \
     | dnsx -json -silent \
     | fkndb -project $projectArg -add subs-resolved \
-    | httpx -json -silent \
+    | httpx -json -silent -ports 80,8080,443,8443,4443,8888 \
     | fkndb -project $projectArg -add subs-probed
 
 
@@ -49,7 +49,7 @@ gotator -mindup -sub /tmp/$domainArg.subs -silent -fast -depth 1 -adv \
     | fkndb -project $projectArg -add subs -src alts \
     | dnsx -json -silent \
     | fkndb -project $projectArg -add subs-resolved \
-    | httpx -json -silent \
+    | httpx -json -silent -ports 80,8080,443,8443,4443,8888 \
     | fkndb -project $projectArg -add subs-probed
 
 # Brute force using custom alts - grab keywords from previous subs
