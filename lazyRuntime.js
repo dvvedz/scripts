@@ -51,39 +51,36 @@ let prefixesFirst = {
 let prefixSecond = ""
 
 let fileNames = {
-    "src_environments_config-schemas_accordion_config_ts": "e4e172eacecf27a1",
-    "src_environments_config-schemas_carousel_config_ts": "1c25ff47bd2096f6",
-    "src_environments_config-schemas_catalog_config_ts": "2aa905836b950831",
-    "src_environments_config-schemas_contentMapping_config_ts": "23156ca7db8eb60d",
-    "src_environments_config-schemas_contentSystems_config_ts": "559163fdd6104a51",
-    "src_environments_config-schemas_cookies_config_ts": "c924b6ae555c2aad",
-    "src_environments_config-schemas_details_config_ts": "d52f9e697c175351",
-    "src_environments_config-schemas_flightSearch_config_ts": "a14fd168b1819ef0",
-    "src_environments_config-schemas_ga_config_ts": "346668303cf05add",
-    "src_environments_config-schemas_imageSizes_config_ts": "a707d23a036aef68",
-    "src_environments_config-schemas_itemAttributes_config_ts": "8fea6cb6290537c3",
-    "src_environments_config-schemas_landing_config_ts": "3956735d0f046547",
-    "src_environments_config-schemas_languageFromUrl_config_ts": "ca5125bf8ee695ec",
-    "src_environments_config-schemas_responsive_config_ts": "2f0c4e17177adfca",
-    "src_environments_config-schemas_search_config_ts": "a293f19e4a16bbdb",
-    "src_environments_config-schemas_shared_config_ts": "851c6786a980e9ef",
-    "src_environments_config-schemas_sort_config_ts": "02bbfbc46a86d255",
-    src_environments_environment_prod_ts: "b8dca7aeff6c11a9",
-    src_environments_overrides_prod_ts: "33cecf0e3a0f6714",
-    src_environments_overrides_ts: "0a1b00ee3c383bc6",
-    src_environments_paginator_config_ts: "c55cfe7b85151299",
-    theme_environments_overrides_ts: "a82ed44f5d8ef9b5",
-    src_app_modules_catalog_catalog_module_ts: "183041ccc5935b2c",
-    common: "3b54d3af896c7393",
-    src_app_modules_details_details_module_ts: "992196fa7d000c4b",
-    "src_app_modules_video-player_video-player_module_ts": "0a008233e2c72a08",
-    "src_app_modules_images-modal_images-modal_module_ts": "14bb93c347cbb8e6",
-    "node_modules_juggle_resize-observer_lib_exports_resize-observer_js": "7f05dd6b517403ea"
+    0: "1fd945d8560ba20ab23f",
+    1: "32d0d5e7a83e00a47a50",
+    2: "f9ea2f04743138110cac",
+    5: "344ce37a51572bb43402",
+    6: "5d8db38367cc3bf14626",
+    7: "5e0b58fa3e09501acdb6",
+    8: "ec7fffb78fa2968de5de",
+    9: "f8e02c4a74d87a732639",
+    10: "36448433a07c6beea638",
+    11: "d5537f15a4cbc5ec3647",
+    12: "a3b97d783cfdc45e0fe1",
+    13: "0bfcf999d21b4d5c191d",
+    14: "b1109cfe80e57e2433d6",
+    15: "fdee266b02532a1528a4",
+    16: "c05df8bbddc9ed076001",
+    17: "d5d3a58513b9d2b0c2f6",
+    18: "91238d78b22b621549d8",
+    19: "49edbfcb023d934be7cb",
+    20: "d739bb4743be22b31102",
+    21: "2f02dee99efdfc5dea82",
+    22: "ad9fe1534fb794a50a03",
+    23: "1e546fc2d17b1794cc08",
+    24: "634ccd0a6292d052f938",
+    25: "280112b9f64fab7d78f6",
+    26: "3a1720d78cc60351f09a"
 }
 
 let suffix = ".js"
 
-let url = "https://inflightentertainment.finnair.com/"
+let url = "https://parcellab.fulfillment.usdh.ikea.net/mgmnt/"
 
 for (let fn in fileNames) {
     // check if prefixesFirst dont have any values
@@ -94,17 +91,18 @@ for (let fn in fileNames) {
 
             if (fn == pf) {
                 if (prefixSecond != "" || !null || !undefined)
-                    console.log(`${prefixVal}${prefixSecond}.${fileName}${suffix}`);
+                    console.log(`${url}${prefixVal}${prefixSecond}.${fileName}${suffix}`);
+                // console.log(`${url}${prefixVal}${prefixSecond}.${fileName}${suffix}`);
                 else
-                    console.log(`${prefixVal}.${fileName}${suffix}`);
+                    console.log(`${url}${prefixVal}.${fileName}${suffix}`);
             }
         }
-        console.log(`${fn}.${fileNames[fn]}${suffix}`)
+        console.log(`${url}${fn}.${fileNames[fn]}${suffix}`)
     } else if (Object.keys(prefixesFirst).length == 0) {
         // if no extensions only run these 
         if (prefixSecond != "" || !null || !undefined)
-            console.log(`${fn}${prefixSecond}.${fileNames[fn]}${suffix}`)
+            console.log(`${url}${fn}${prefixSecond}.${fileNames[fn]}${suffix}`)
         else
-            console.log(`${fn}.${fileNames[fn]}${suffix}`)
+            console.log(`${url}${fn}.${fileNames[fn]}${suffix}`)
     }
 }
